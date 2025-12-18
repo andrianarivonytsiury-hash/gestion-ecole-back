@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { PaymentsController } from './payments.controller';
-import { PaymentsService } from './payments.service';
+import { Module } from '@nestjs/common'; // Décorateur module.
+import { PaymentsController } from './payments.controller'; // Contrôleur paiements.
+import { PaymentsService } from './payments.service'; // Service paiements.
 
 @Module({
-  controllers: [PaymentsController],
-  providers: [PaymentsService]
+  controllers: [PaymentsController], // Routes exposées.
+  providers: [PaymentsService], // Service injectable.
 })
-export class PaymentsModule {}
+export class PaymentsModule {} // Module payments.

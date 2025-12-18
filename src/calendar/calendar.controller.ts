@@ -1,37 +1,37 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { IsDateString, IsString } from 'class-validator';
-import { CalendarService } from './calendar.service';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'; // Décorateurs Nest pour routes et accès aux params/body.
+import { IsDateString, IsString } from 'class-validator'; // Validations de types simples.
+import { CalendarService } from './calendar.service'; // Service métier du calendrier.
 
 class HolidayDto {
-  @IsString()
+  @IsString() // Libellé en texte.
   label!: string;
 
-  @IsDateString()
+  @IsDateString() // Date ISO pour début.
   startDate!: string;
 
-  @IsDateString()
+  @IsDateString() // Date ISO pour fin.
   endDate!: string;
 
-  @IsString()
+  @IsString() // Type de congé (holiday/pause...).
   type!: string;
 }
 
-@Controller('calendar')
+@Controller('calendar') // Préfixe de route /calendar.
 export class CalendarController {
-  constructor(private readonly calendarService: CalendarService) {}
+  constructor(private readonly calendarService: CalendarService) {} // Injection du service.
 
-  @Get('holidays')
+  @Get('holidays') // GET /calendar/holidays
   list() {
-    return this.calendarService.list();
+    return this.calendarService.list(); // Retourne la liste triée.
   }
 
-  @Post('holidays')
+  @Post('holidays') // POST /calendar/holidays
   add(@Body() payload: HolidayDto) {
-    return this.calendarService.add(payload);
+    return this.calendarService.add(payload); // Crée un congé.
   }
 
-  @Delete('holidays/:id')
+  @Delete('holidays/:id') // DELETE /calendar/holidays/:id
   remove(@Param('id') id: string) {
-    return this.calendarService.remove(Number(id));
+    return this.calendarService.remove(Number(id)); // Supprime par id.
   }
 }

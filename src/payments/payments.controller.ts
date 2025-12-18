@@ -1,18 +1,18 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import type { PaymentRequest } from './payments.service';
-import { PaymentsService } from './payments.service';
+import { Body, Controller, Get, Post } from '@nestjs/common'; // Décorateurs Nest pour contrôleur/routes.
+import type { PaymentRequest } from './payments.service'; // Type pour la requête de paiement.
+import { PaymentsService } from './payments.service'; // Service des paiements.
 
-@Controller('payments')
+@Controller('payments') // Préfixe /payments.
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(private readonly paymentsService: PaymentsService) {} // Injection du service.
 
-  @Post('checkout')
+  @Post('checkout') // POST /payments/checkout
   create(@Body() payload: PaymentRequest) {
-    return this.paymentsService.createCheckout(payload);
+    return this.paymentsService.createCheckout(payload); // Crée un paiement mock.
   }
 
-  @Get()
+  @Get() // GET /payments
   list() {
-    return this.paymentsService.list();
+    return this.paymentsService.list(); // Liste des paiements en base.
   }
 }

@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { FinanceController } from './finance.controller';
-import { FinanceService } from './finance.service';
+import { Module } from '@nestjs/common'; // Décorateur module.
+import { FinanceController } from './finance.controller'; // Contrôleur finance.
+import { FinanceService } from './finance.service'; // Service finance.
 
 @Module({
-  controllers: [FinanceController],
-  providers: [FinanceService]
+  controllers: [FinanceController], // Routes exposées.
+  providers: [FinanceService], // Service injectable.
 })
-export class FinanceModule {}
+export class FinanceModule {} // Module finance.

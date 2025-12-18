@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { CalendarController } from './calendar.controller';
-import { CalendarService } from './calendar.service';
+import { Module } from '@nestjs/common'; // Décorateur module Nest.
+import { CalendarController } from './calendar.controller'; // Contrôleur calendrier.
+import { CalendarService } from './calendar.service'; // Service calendrier.
 
 @Module({
-  controllers: [CalendarController],
-  providers: [CalendarService]
+  controllers: [CalendarController], // Routes exposées.
+  providers: [CalendarService], // Service injecté.
 })
-export class CalendarModule {}
+export class CalendarModule {} // Déclare le module Calendar.

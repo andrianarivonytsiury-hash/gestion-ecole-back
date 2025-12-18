@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { CoursesController } from './courses.controller';
-import { CoursesService } from './courses.service';
+import { Module } from '@nestjs/common'; // Décorateur module.
+import { CoursesController } from './courses.controller'; // Contrôleur des cours.
+import { CoursesService } from './courses.service'; // Service des cours.
 
 @Module({
-  controllers: [CoursesController],
-  providers: [CoursesService]
+  controllers: [CoursesController], // Routes exposées.
+  providers: [CoursesService], // Service injectable.
 })
-export class CoursesModule {}
+export class CoursesModule {} // Module courses.

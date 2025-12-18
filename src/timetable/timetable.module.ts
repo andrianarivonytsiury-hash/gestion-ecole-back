@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { TimetableController } from './timetable.controller';
-import { TimetableService } from './timetable.service';
+import { Module } from '@nestjs/common'; // Décorateur module.
+import { TimetableController } from './timetable.controller'; // Contrôleur emploi du temps.
+import { TimetableService } from './timetable.service'; // Service emploi du temps.
 
 @Module({
-  controllers: [TimetableController],
-  providers: [TimetableService]
+  controllers: [TimetableController], // Routes exposées.
+  providers: [TimetableService], // Service injectable.
 })
-export class TimetableModule {}
+export class TimetableModule {} // Module timetable.

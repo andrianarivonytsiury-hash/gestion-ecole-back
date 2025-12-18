@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common'; // Décorateur injectable.
+import { PrismaService } from '../prisma/prisma.service'; // Accès base.
 
-@Injectable()
+@Injectable() // Marque le service injectable.
 export class ClassesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {} // Injecte Prisma.
 
   findAll() {
-    return this.prisma.class.findMany({ orderBy: { id: 'asc' } });
+    return this.prisma.class.findMany({ orderBy: { id: 'asc' } }); // Récupère toutes les classes triées par id.
   }
 }

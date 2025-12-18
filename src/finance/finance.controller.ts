@@ -1,52 +1,52 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
-import { FinanceService } from './finance.service';
+import { Body, Controller, Get, Post } from '@nestjs/common'; // Décorateurs Nest pour définir routes et lire body.
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator'; // Validations DTO.
+import { FinanceService } from './finance.service'; // Service finances.
 
 class CreateFinanceDto {
-  @IsDateString()
+  @IsDateString() // Date ISO de l'opération.
   date!: string;
 
-  @IsString()
+  @IsString() // Référence texte.
   reference!: string;
 
-  @IsString()
+  @IsString() // Libellé de l'opération.
   libelle!: string;
 
-  @IsNumber()
+  @IsNumber() // Montant débit.
   debit!: number;
 
-  @IsNumber()
+  @IsNumber() // Montant crédit.
   credit!: number;
 
-  @IsOptional()
+  @IsOptional() // Éventuel élève lié.
   @IsNumber()
   studentId?: number;
 
-  @IsOptional()
+  @IsOptional() // Moyen de paiement optionnel.
   @IsString()
   moyen?: string;
 
-  @IsOptional()
+  @IsOptional() // Statut optionnel.
   @IsString()
   statut?: string;
 }
 
-@Controller('finance')
+@Controller('finance') // Préfixe /finance.
 export class FinanceController {
-  constructor(private readonly financeService: FinanceService) {}
+  constructor(private readonly financeService: FinanceService) {} // Injection du service.
 
-  @Get('flows')
+  @Get('flows') // GET /finance/flows
   list() {
-    return this.financeService.list();
+    return this.financeService.list(); // Liste des flux.
   }
 
-  @Post('flows')
+  @Post('flows') // POST /finance/flows
   create(@Body() payload: CreateFinanceDto) {
-    return this.financeService.create(payload);
+    return this.financeService.create(payload); // Crée un flux.
   }
 
-  @Get('stats/monthly')
+  @Get('stats/monthly') // GET /finance/stats/monthly
   monthly() {
-    return this.financeService.monthlyStats();
+    return this.financeService.monthlyStats(); // Statistiques mensuelles.
   }
 }

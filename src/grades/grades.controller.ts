@@ -1,38 +1,38 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { IsInt, IsNumber, IsString } from 'class-validator';
-import { GradesService } from './grades.service';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common'; // Décorateurs Nest pour contrôleur/routes.
+import { IsInt, IsNumber, IsString } from 'class-validator'; // Validations DTO.
+import { GradesService } from './grades.service'; // Service des notes.
 
 class CreateGradeDto {
-  @IsInt()
+  @IsInt() // Élève concerné.
   studentId!: number;
 
-  @IsInt()
+  @IsInt() // Cours concerné.
   courseId!: number;
 
-  @IsNumber()
+  @IsNumber() // Valeur numérique.
   valeur!: number;
 
-  @IsString()
+  @IsString() // Type d'évaluation.
   typeEval!: string;
 
-  @IsNumber()
+  @IsNumber() // Coefficient.
   coeff!: number;
 
-  @IsInt()
+  @IsInt() // Auteur de la saisie.
   createdBy!: number;
 }
 
-@Controller('grades')
+@Controller('grades') // Préfixe /grades.
 export class GradesController {
-  constructor(private readonly gradesService: GradesService) {}
+  constructor(private readonly gradesService: GradesService) {} // Injection du service.
 
-  @Get()
+  @Get() // GET /grades?studentId=...
   list(@Query('studentId') studentId: string) {
-    return this.gradesService.byStudent(Number(studentId));
+    return this.gradesService.byStudent(Number(studentId)); // Liste des notes d'un élève.
   }
 
-  @Post()
+  @Post() // POST /grades
   create(@Body() payload: CreateGradeDto) {
-    return this.gradesService.create(payload);
+    return this.gradesService.create(payload); // Crée une note.
   }
 }

@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { AttendanceController } from './attendance.controller';
-import { AttendanceService } from './attendance.service';
+import { Module } from '@nestjs/common'; // Décorateur module Nest.
+import { AttendanceController } from './attendance.controller'; // Contrôleur de présences.
+import { AttendanceService } from './attendance.service'; // Service de présences.
 
 @Module({
-  controllers: [AttendanceController],
-  providers: [AttendanceService]
+  controllers: [AttendanceController], // Routes exposées.
+  providers: [AttendanceService], // Services injectables.
 })
-export class AttendanceModule {}
+export class AttendanceModule {} // Déclare le module Attendance.

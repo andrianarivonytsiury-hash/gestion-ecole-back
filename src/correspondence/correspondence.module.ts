@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { CorrespondenceController } from './correspondence.controller';
-import { CorrespondenceService } from './correspondence.service';
+import { Module } from '@nestjs/common'; // Décorateur module.
+import { CorrespondenceController } from './correspondence.controller'; // Contrôleur correspondance.
+import { CorrespondenceService } from './correspondence.service'; // Service correspondance.
 
 @Module({
-  controllers: [CorrespondenceController],
-  providers: [CorrespondenceService]
+  controllers: [CorrespondenceController], // Routes correspondance.
+  providers: [CorrespondenceService], // Service injectable.
 })
-export class CorrespondenceModule {}
+export class CorrespondenceModule {} // Module correspondance.
