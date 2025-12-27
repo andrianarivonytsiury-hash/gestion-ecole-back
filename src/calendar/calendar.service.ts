@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common'; // Décorateur injectable.
-import { PrismaService } from '../prisma/prisma.service'; // Accès base via Prisma.
+﻿import { Injectable } from '@nestjs/common';
 
-@Injectable() // Marque le service pour l'injection.
+export interface HolidayRecord {
+  id: number;
+  label: string;
+  startDate: string;
+  endDate: string;
+  type: string;
+}
+
+@Injectable()
 export class CalendarService {
-  constructor(private readonly prisma: PrismaService) {} // Injection Prisma.
+  private holidays: HolidayRecord[] = [
+    { id: 1, label: 'Vacances de Noel', startDate: '2024-12-20', endDate: '2025-01-05', type: 'holiday' },
+    { id: 2, label: 'Journee pedagogique', startDate: '2025-02-14', endDate: '2025-02-14', type: 'pause' },
+  ];
 
   list() {
-    return this.prisma.holiday.findMany({ orderBy: { startDate: 'asc' } }); // Récupère tous les congés triés par date.
+    return this.holidays;
   }
 
   add(payload: { label: string; startDate: string; endDate: string; type: string }) {
-    return this.prisma.holiday.create({
-      data: {
-        label: payload.label, // Libellé du congé.
-        startDate: new Date(payload.startDate), // Conversion string -> Date.
-        endDate: new Date(payload.endDate), // Conversion string -> Date.
-        type: payload.type, // Type de congé.
-      },
-    });
+    const id = (this.holidays[this.holidays.length - 1]?.id || 0) + 1;
+    const record: HolidayRecord = { id, ...payload };
+    this.holidays.push(record);
+    return record;
   }
 
   remove(id: number) {
-    return this.prisma.holiday.delete({ where: { id } }); // Supprime par identifiant.
+    const before = this.holidays.length;
+    this.holidays = this.holidays.filter((h) => h.id !== id);
+    return { removed: before - this.holidays.length };
   }
 }

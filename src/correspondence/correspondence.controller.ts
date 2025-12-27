@@ -1,17 +1,17 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'; // Décorateurs Nest pour définir routes et lire body/query.
-import { CorrespondenceService, CorrespondenceMessage } from './correspondence.service'; // Service + type message.
+﻿import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { CorrespondenceService, CorrespondenceMessage } from './correspondence.service';
 
-@Controller('correspondence') // Préfixe /correspondence.
+@Controller('correspondence')
 export class CorrespondenceController {
-  constructor(private readonly correspondenceService: CorrespondenceService) {} // Injection du service.
+  constructor(private readonly correspondenceService: CorrespondenceService) {}
 
-  @Get() // GET /correspondence?studentId=...
-  byStudent(@Query('studentId') studentId: string): CorrespondenceMessage[] {
-    return this.correspondenceService.byStudent(Number(studentId)); // Convertit l'id et retourne les messages.
+  @Get()
+  byStudent(@Query('studentId') studentId?: string): CorrespondenceMessage[] {
+    return this.correspondenceService.byStudent(studentId ? Number(studentId) : undefined);
   }
 
-  @Post() // POST /correspondence
+  @Post()
   add(@Body() payload: Omit<CorrespondenceMessage, 'id' | 'createdAt'>) {
-    return this.correspondenceService.add(payload); // Ajoute un message en mémoire.
+    return this.correspondenceService.add(payload);
   }
 }
