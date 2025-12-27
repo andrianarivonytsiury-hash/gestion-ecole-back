@@ -1,39 +1,31 @@
 ﻿import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface PaymentRequest {
-  student: string;
+  studentId: number;
   amount: number;
   currency?: string;
   method?: string;
 }
 
-export interface PaymentRecord extends PaymentRequest {
-  id: number;
-  status: 'succeeded' | 'requires_action';
-  receiptUrl?: string;
-}
-
 @Injectable()
 export class PaymentsService {
-  private payments: PaymentRecord[] = [
-    { id: 1, student: 'Lina Rakoto', amount: 200, currency: 'EUR', method: 'card', status: 'succeeded' },
-    { id: 2, student: 'Noah Randrian', amount: 200, currency: 'EUR', method: 'card', status: 'requires_action' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   createCheckout(payload: PaymentRequest) {
-    const id = (this.payments[this.payments.length - 1]?.id || 0) + 1;
-    const record: PaymentRecord = {
-      id,
-      currency: payload.currency || 'EUR',
-      method: payload.method || 'card',
-      status: 'requires_action',
-      ...payload,
-    };
-    this.payments.push(record);
-    return record;
+    return this.prisma.payment.create({
+      data: {
+        studentId: payload.studentId,
+        amount: payload.amount,
+        currency: payload.currency || 'EUR',
+        method: payload.method || 'card',
+        status: 'requires_action',
+        stripePiId: '',
+      },
+    });
   }
 
-  list(): PaymentRecord[] {
-    return this.payments;
+  list() {
+    return this.prisma.payment.findMany({ include: { student: true } });
   }
 }

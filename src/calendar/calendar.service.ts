@@ -1,34 +1,26 @@
 ﻿import { Injectable } from '@nestjs/common';
-
-export interface HolidayRecord {
-  id: number;
-  label: string;
-  startDate: string;
-  endDate: string;
-  type: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CalendarService {
-  private holidays: HolidayRecord[] = [
-    { id: 1, label: 'Vacances de Noel', startDate: '2024-12-20', endDate: '2025-01-05', type: 'holiday' },
-    { id: 2, label: 'Journee pedagogique', startDate: '2025-02-14', endDate: '2025-02-14', type: 'pause' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   list() {
-    return this.holidays;
+    return this.prisma.holiday.findMany({ orderBy: { startDate: 'asc' } });
   }
 
   add(payload: { label: string; startDate: string; endDate: string; type: string }) {
-    const id = (this.holidays[this.holidays.length - 1]?.id || 0) + 1;
-    const record: HolidayRecord = { id, ...payload };
-    this.holidays.push(record);
-    return record;
+    return this.prisma.holiday.create({
+      data: {
+        label: payload.label,
+        startDate: new Date(payload.startDate),
+        endDate: new Date(payload.endDate),
+        type: payload.type,
+      },
+    });
   }
 
   remove(id: number) {
-    const before = this.holidays.length;
-    this.holidays = this.holidays.filter((h) => h.id !== id);
-    return { removed: before - this.holidays.length };
+    return this.prisma.holiday.delete({ where: { id } });
   }
 }

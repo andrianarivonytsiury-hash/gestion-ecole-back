@@ -1,28 +1,15 @@
 ﻿import { Injectable } from '@nestjs/common';
-
-export interface CourseRecord {
-  id: number;
-  class: string;
-  label: string;
-  start: string;
-  room: string;
-  status: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CoursesService {
-  private courses: CourseRecord[] = [
-    { id: 1, class: '6eme A', label: 'Mathematiques - Algebre', start: '08:00', room: 'Salle 101', status: 'prevu' },
-    { id: 2, class: 'Terminale S', label: 'Physique - Optique', start: '10:30', room: 'Lab 1', status: 'prevu' },
-    { id: 3, class: '6eme A', label: 'Anglais - Conversation', start: '14:00', room: 'Salle 202', status: 'prevu' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   findAll() {
-    return this.courses;
+    return this.prisma.course.findMany({ include: { class: true, teacher: true } });
   }
 
   findByClass(classId: number) {
-    if (!Number.isFinite(classId)) return this.courses;
-    return this.courses.filter((c) => c.id === classId || c.class.includes(String(classId)));
+    return this.prisma.course.findMany({ where: { classId }, include: { class: true, teacher: true } });
   }
 }

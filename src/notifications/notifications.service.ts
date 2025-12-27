@@ -1,34 +1,24 @@
 ﻿import { Injectable } from '@nestjs/common';
-
-export interface NotificationRecord {
-  id: number;
-  title: string;
-  message: string;
-  channel: 'sms' | 'email' | 'push';
-  status: 'sent' | 'queued';
-  sentAt: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class NotificationsService {
-  private notifications: NotificationRecord[] = [
-    { id: 1, title: 'Absence Sarina', message: 'Parent notifie par email', channel: 'email', status: 'sent', sentAt: new Date().toISOString() },
-    { id: 2, title: 'Retard Noah', message: 'SMS envoye (5 min de retard)', channel: 'sms', status: 'sent', sentAt: new Date().toISOString() },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  list(): NotificationRecord[] {
-    return this.notifications;
+  list() {
+    return this.prisma.notification.findMany({ orderBy: { id: 'asc' } });
   }
 
-  send(payload: Omit<NotificationRecord, 'id' | 'status' | 'sentAt'>) {
-    const id = (this.notifications[this.notifications.length - 1]?.id || 0) + 1;
-    const record: NotificationRecord = {
-      id,
-      status: 'sent',
-      sentAt: new Date().toISOString(),
-      ...payload,
-    };
-    this.notifications.push(record);
-    return record;
+  send(payload: { title?: string; message?: string; channel: string; targetUserId: number }) {
+    return this.prisma.notification.create({
+      data: {
+        type: payload.title || 'notification',
+        channel: payload.channel,
+        payload: { title: payload.title, message: payload.message },
+        status: 'sent',
+        targetUserId: payload.targetUserId,
+        sentAt: new Date(),
+      },
+    });
   }
 }

@@ -1,12 +1,12 @@
 ﻿import { Controller, Get } from '@nestjs/common';
-import { TimetableService, TimetableRecord } from './timetable.service';
+import { TimetableService } from './timetable.service';
 
 @Controller('timetable')
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
   @Get()
-  list(): TimetableRecord[] {
+  list() {
     return this.timetableService.list();
   }
 }

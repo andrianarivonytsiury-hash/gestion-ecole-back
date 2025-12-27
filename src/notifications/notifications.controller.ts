@@ -1,17 +1,24 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'; // Décorateurs Nest pour contrôleur/routes.
-import { NotificationRecord, NotificationsService } from './notifications.service'; // Service + type notification.
+﻿import { Body, Controller, Get, Post } from '@nestjs/common';
+import { NotificationsService } from './notifications.service';
 
-@Controller('notifications') // Préfixe /notifications.
+class CreateNotificationDto {
+  channel!: string;
+  title?: string;
+  message?: string;
+  targetUserId!: number;
+}
+
+@Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {} // Injection du service.
+  constructor(private readonly notificationsService: NotificationsService) {}
 
-  @Get() // GET /notifications
-  list(): NotificationRecord[] {
-    return this.notificationsService.list(); // Retourne la liste en mémoire.
+  @Get()
+  list() {
+    return this.notificationsService.list();
   }
 
-  @Post() // POST /notifications
-  send(@Body() payload: Omit<NotificationRecord, 'id' | 'status' | 'sentAt'>) {
-    return this.notificationsService.send(payload); // Ajoute une notification fictive envoyée.
+  @Post()
+  send(@Body() payload: CreateNotificationDto) {
+    return this.notificationsService.send(payload);
   }
 }

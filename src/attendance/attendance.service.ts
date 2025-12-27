@@ -1,45 +1,35 @@
 ﻿import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 export type AttendanceStatus = 'present' | 'absent' | 'retard' | 'excused';
 
-export interface AttendanceRecord {
-  id: number;
-  studentId: number;
-  student: string;
-  courseId: number;
-  status: AttendanceStatus;
-  motif?: string;
-}
-
 interface BulkAttendanceDto {
   courseId: number;
-  records: Array<{ studentId: number; status: AttendanceStatus; motif?: string; student?: string }>;
+  records: Array<{ studentId: number; status: AttendanceStatus; motif?: string }>;
 }
 
 @Injectable()
 export class AttendanceService {
-  private records: AttendanceRecord[] = [
-    { id: 1, studentId: 1, student: 'Lina Rakoto', courseId: 1, status: 'present' },
-    { id: 2, studentId: 2, student: 'Noah Randrian', courseId: 1, status: 'retard', motif: 'Transport' },
-    { id: 3, studentId: 3, student: 'Sarina Andry', courseId: 2, status: 'absent', motif: 'Malade' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   byCourse(courseId?: number) {
-    if (!courseId || Number.isNaN(courseId)) return this.records;
-    return this.records.filter((r) => r.courseId === courseId);
+    return this.prisma.attendance.findMany({
+      where: courseId && !Number.isNaN(courseId) ? { courseId } : {},
+      include: { student: true },
+      orderBy: { id: 'asc' },
+    });
   }
 
-  bulkMark(payload: BulkAttendanceDto) {
-    const startId = this.records[this.records.length - 1]?.id ?? 0;
-    const newRecords: AttendanceRecord[] = payload.records.map((rec, idx) => ({
-      id: startId + idx + 1,
-      courseId: payload.courseId,
-      studentId: rec.studentId,
-      student: rec.student || `Etudiant ${rec.studentId}`,
-      status: rec.status,
-      motif: rec.motif,
-    }));
-    this.records.push(...newRecords);
-    return { inserted: newRecords.length };
+  async bulkMark(payload: BulkAttendanceDto) {
+    const created = await this.prisma.attendance.createMany({
+      data: payload.records.map((record) => ({
+        courseId: payload.courseId,
+        studentId: record.studentId,
+        status: record.status,
+        motif: record.motif,
+        notifiedAt: record.status === 'absent' || record.status === 'retard' ? new Date() : undefined,
+      })),
+    });
+    return { inserted: created.count };
   }
 }

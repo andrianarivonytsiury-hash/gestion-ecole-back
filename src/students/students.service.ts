@@ -1,27 +1,32 @@
 ﻿import { Injectable } from '@nestjs/common';
-
-export interface StudentRecord {
-  id: number;
-  firstName: string;
-  lastName: string;
-  classLabel: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class StudentsService {
-  private students: StudentRecord[] = [
-    { id: 1, firstName: 'Lina', lastName: 'Rakoto', classLabel: '6eme A' },
-    { id: 2, firstName: 'Noah', lastName: 'Randrian', classLabel: '6eme A' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   list() {
-    return this.students;
+    return this.prisma.student.findMany({
+      include: { class: true, guardians: true },
+      orderBy: { id: 'asc' },
+    });
   }
 
-  create(payload: Omit<StudentRecord, 'id'>) {
-    const id = (this.students[this.students.length - 1]?.id || 0) + 1;
-    const student: StudentRecord = { id, ...payload };
-    this.students.push(student);
-    return student;
+  create(payload: { matricule: string; firstName: string; lastName: string; classId: number; dossierUrl?: string; guardianIds?: number[] }) {
+    return this.prisma.student.create({
+      data: {
+        matricule: payload.matricule,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        classId: payload.classId,
+        dossierUrl: payload.dossierUrl,
+        guardians: payload.guardianIds?.length
+          ? {
+              connect: payload.guardianIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      include: { class: true, guardians: true },
+    });
   }
 }
