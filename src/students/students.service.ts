@@ -44,7 +44,13 @@ export class StudentsService {
       },
       include: { class: true, guardians: true },
     });
-    this.events.emit('students:updated', { id: student.id });
+    this.events.emit('students:updated', { id: student.id, action: 'created' });
     return student;
+  }
+
+  async delete(id: number) {
+    const deleted = await this.prisma.student.delete({ where: { id } });
+    this.events.emit('students:updated', { id, action: 'deleted' });
+    return deleted;
   }
 }

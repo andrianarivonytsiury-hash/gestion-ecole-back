@@ -1,4 +1,4 @@
-﻿import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+﻿import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 import { StudentsService } from './students.service';
 
@@ -41,5 +41,10 @@ export class StudentsController {
   @Post()
   create(@Body() payload: CreateStudentDto) {
     return this.studentsService.create(payload);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.studentsService.delete(Number(id));
   }
 }
