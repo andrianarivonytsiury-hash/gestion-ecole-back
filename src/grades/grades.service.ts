@@ -1,9 +1,10 @@
 ﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class GradesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly events: EventsGateway) {}
 
   byStudent(studentId?: number) {
     return this.prisma.grade.findMany({
@@ -13,7 +14,9 @@ export class GradesService {
     });
   }
 
-  create(payload: { studentId: number; courseId: number; valeur: number; typeEval: string; coeff: number; createdBy: number }) {
-    return this.prisma.grade.create({ data: payload });
+  async create(payload: { studentId: number; courseId: number; valeur: number; typeEval: string; coeff: number; createdBy: number }) {
+    const grade = await this.prisma.grade.create({ data: payload });
+    this.events.emit('grades:updated', { studentId: payload.studentId, id: grade.id });
+    return grade;
   }
 }

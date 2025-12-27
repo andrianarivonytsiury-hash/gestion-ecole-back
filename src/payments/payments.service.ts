@@ -1,5 +1,6 @@
 ﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsGateway } from '../events/events.gateway';
 
 export interface PaymentRequest {
   studentId: number;
@@ -10,10 +11,10 @@ export interface PaymentRequest {
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly events: EventsGateway) {}
 
-  createCheckout(payload: PaymentRequest) {
-    return this.prisma.payment.create({
+  async createCheckout(payload: PaymentRequest) {
+    const payment = await this.prisma.payment.create({
       data: {
         studentId: payload.studentId,
         amount: payload.amount,
@@ -23,6 +24,8 @@ export class PaymentsService {
         stripePiId: '',
       },
     });
+    this.events.emit('payments:updated', { studentId: payload.studentId, id: payment.id });
+    return payment;
   }
 
   list() {

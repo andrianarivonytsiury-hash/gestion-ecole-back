@@ -15,6 +15,7 @@ import { PaymentsModule } from './payments/payments.module'; // Module paiements
 import { NotificationsModule } from './notifications/notifications.module'; // Module notifications (stub).
 import { CorrespondenceModule } from './correspondence/correspondence.module'; // Module correspondance/carnet (stub).
 import { PrismaModule } from './prisma/prisma.module'; // Module Prisma (connexion DB + service).
+import { EventsModule } from './events/events.module'; // Module WebSocket (temps reel).
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PrismaModule } from './prisma/prisma.module'; // Module Prisma (connexi
     PaymentsModule, // Route /payments (stub).
     NotificationsModule, // Route /notifications (stub).
     CorrespondenceModule, // Route /correspondence (stub).
+    EventsModule, // WebSockets temps reel.
   ],
   controllers: [AppController], // Contrôleurs exposés par ce module racine.
   providers: [AppService], // Services injectables accessibles dans le module.

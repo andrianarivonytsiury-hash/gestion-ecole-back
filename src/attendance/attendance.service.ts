@@ -1,4 +1,5 @@
 ﻿import { Injectable } from '@nestjs/common';
+import { EventsGateway } from '../events/events.gateway';
 import { PrismaService } from '../prisma/prisma.service';
 
 export type AttendanceStatus = 'present' | 'absent' | 'retard' | 'excused';
@@ -10,7 +11,7 @@ interface BulkAttendanceDto {
 
 @Injectable()
 export class AttendanceService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly events: EventsGateway) {}
 
   byCourse(courseId?: number) {
     return this.prisma.attendance.findMany({
@@ -30,6 +31,7 @@ export class AttendanceService {
         notifiedAt: record.status === 'absent' || record.status === 'retard' ? new Date() : undefined,
       })),
     });
+    this.events.emit('attendance:updated', { courseId: payload.courseId });
     return { inserted: created.count };
   }
 }

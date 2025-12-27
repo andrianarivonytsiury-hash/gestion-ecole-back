@@ -1,4 +1,4 @@
-﻿import { Body, Controller, Get, Post } from '@nestjs/common';
+﻿import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 import { StudentsService } from './students.service';
 
@@ -31,6 +31,11 @@ export class StudentsController {
   @Get()
   list() {
     return this.studentsService.list();
+  }
+
+  @Get(':id/details')
+  details(@Param('id') id: string) {
+    return this.studentsService.details(Number(id));
   }
 
   @Post()

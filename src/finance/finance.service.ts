@@ -1,30 +1,33 @@
-import { Injectable } from '@nestjs/common'; // Décorateur injectable.
-import { PrismaService } from '../prisma/prisma.service'; // Accès DB via Prisma.
+﻿import { Injectable } from '@nestjs/common';
+import { EventsGateway } from '../events/events.gateway';
+import { PrismaService } from '../prisma/prisma.service';
 
-@Injectable() // Marque la classe pour l'injection.
+@Injectable()
 export class FinanceService {
-  constructor(private readonly prisma: PrismaService) {} // Injecte Prisma.
+  constructor(private readonly prisma: PrismaService, private readonly events: EventsGateway) {}
 
   list() {
-    return this.prisma.financeFlow.findMany({ orderBy: { date: 'asc' } }); // Récupère tous les flux triés par date.
+    return this.prisma.financeFlow.findMany({ orderBy: { date: 'asc' } });
   }
 
   async create(payload: { date: string; reference: string; libelle: string; debit: number; credit: number; studentId?: number; moyen?: string; statut?: string }) {
-    const last = await this.prisma.financeFlow.findFirst({ orderBy: { id: 'desc' } }); // Récupère le dernier flux pour calculer le solde.
-    const solde = (last?.solde ?? 0) + payload.credit - payload.debit; // Nouveau solde = ancien + crédit - débit.
-    return this.prisma.financeFlow.create({
-      data: { ...payload, date: new Date(payload.date), solde }, // Écrit le flux avec date convertie et solde calculé.
+    const last = await this.prisma.financeFlow.findFirst({ orderBy: { id: 'desc' } });
+    const solde = (last?.solde ?? 0) + payload.credit - payload.debit;
+    const flow = await this.prisma.financeFlow.create({
+      data: { ...payload, date: new Date(payload.date), solde },
     });
+    this.events.emit('finance:updated', { studentId: payload.studentId, id: flow.id });
+    return flow;
   }
 
   async monthlyStats() {
-    const flows = await this.prisma.financeFlow.findMany(); // Récupère tous les flux.
+    const flows = await this.prisma.financeFlow.findMany();
     return flows.reduce<Record<string, { debit: number; credit: number }>>((acc, flow) => {
-      const month = flow.date.toISOString().slice(0, 7); // Clé AAAA-MM.
-      acc[month] = acc[month] ?? { debit: 0, credit: 0 }; // Initialise si absent.
-      acc[month].debit += flow.debit; // Cumule les débits.
-      acc[month].credit += flow.credit; // Cumule les crédits.
-      return acc; // Retourne l'accumulateur.
+      const month = flow.date.toISOString().slice(0, 7);
+      acc[month] = acc[month] ?? { debit: 0, credit: 0 };
+      acc[month].debit += flow.debit;
+      acc[month].credit += flow.credit;
+      return acc;
     }, {});
   }
 }
