@@ -48,6 +48,27 @@ export class StudentsService {
     return student;
   }
 
+  async update(payload: { id: number; matricule?: string; firstName?: string; lastName?: string; classId?: number; guardianIds?: number[] }) {
+    const student = await this.prisma.student.update({
+      where: { id: payload.id },
+      data: {
+        matricule: payload.matricule,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        classId: payload.classId,
+        guardians: payload.guardianIds?.length
+          ? {
+              set: [],
+              connect: payload.guardianIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      include: { class: true, guardians: true },
+    });
+    this.events.emit('students:updated', { id: student.id, action: 'updated' });
+    return student;
+  }
+
   async delete(id: number) {
     const deleted = await this.prisma.student.delete({ where: { id } });
     this.events.emit('students:updated', { id, action: 'deleted' });

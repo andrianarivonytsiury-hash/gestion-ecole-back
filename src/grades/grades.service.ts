@@ -19,4 +19,29 @@ export class GradesService {
     this.events.emit('grades:updated', { studentId: payload.studentId, id: grade.id });
     return grade;
   }
+
+  async update(
+    id: number,
+    payload: Partial<{
+      studentId: number;
+      courseId: number;
+      valeur: number;
+      typeEval: string;
+      coeff: number;
+      updatedBy: number;
+    }>,
+  ) {
+    const grade = await this.prisma.grade.update({
+      where: { id },
+      data: payload,
+    });
+    this.events.emit('grades:updated', { studentId: grade.studentId, id: grade.id, action: 'updated' });
+    return grade;
+  }
+
+  async delete(id: number) {
+    const grade = await this.prisma.grade.delete({ where: { id } });
+    this.events.emit('grades:updated', { studentId: grade.studentId, id: grade.id, action: 'deleted' });
+    return grade;
+  }
 }

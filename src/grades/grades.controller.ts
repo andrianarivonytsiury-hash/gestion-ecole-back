@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'; // Décorateurs Nest pour contrôleur/routes.
-import { IsInt, IsNumber, IsString } from 'class-validator'; // Validations DTO.
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'; // Décorateurs Nest pour contrôleur/routes.
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator'; // Validations DTO.
 import { GradesService } from './grades.service'; // Service des notes.
 
 class CreateGradeDto {
@@ -22,6 +22,32 @@ class CreateGradeDto {
   createdBy!: number;
 }
 
+class UpdateGradeDto {
+  @IsOptional()
+  @IsInt()
+  studentId?: number;
+
+  @IsOptional()
+  @IsInt()
+  courseId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  valeur?: number;
+
+  @IsOptional()
+  @IsString()
+  typeEval?: string;
+
+  @IsOptional()
+  @IsNumber()
+  coeff?: number;
+
+  @IsOptional()
+  @IsInt()
+  updatedBy?: number;
+}
+
 @Controller('grades') // Préfixe /grades.
 export class GradesController {
   constructor(private readonly gradesService: GradesService) {} // Injection du service.
@@ -34,5 +60,15 @@ export class GradesController {
   @Post() // POST /grades
   create(@Body() payload: CreateGradeDto) {
     return this.gradesService.create(payload); // Crée une note.
+  }
+
+  @Put(':id') // PUT /grades/:id
+  update(@Param('id') id: string, @Body() payload: UpdateGradeDto) {
+    return this.gradesService.update(Number(id), payload); // Met à jour une note.
+  }
+
+  @Delete(':id') // DELETE /grades/:id
+  remove(@Param('id') id: string) {
+    return this.gradesService.delete(Number(id)); // Supprime une note.
   }
 }
